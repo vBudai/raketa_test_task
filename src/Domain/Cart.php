@@ -10,6 +10,7 @@ final class Cart
         readonly private string $uuid,
         readonly private Customer $customer,
         readonly private string $paymentMethod,
+        /** @var CartItem[] */
         private array $items,
     ) {
     }

@@ -4,49 +4,66 @@ declare(strict_types = 1);
 
 namespace Raketa\BackendTestTask\Repository;
 
+use Cassandra\Uuid;
 use Exception;
 use Psr\Log\LoggerInterface;
 use Raketa\BackendTestTask\Domain\Cart;
-use Raketa\BackendTestTask\Infrastructure\ConnectorFacade;
+use Raketa\BackendTestTask\Infrastructure\Connector;
+use Raketa\BackendTestTask\Infrastructure\ConnectorBuilder;
+use Raketa\BackendTestTask\Infrastructure\Exception\ConnectorException;
 
-class CartManager extends ConnectorFacade
+class CartManager
 {
-    public $logger;
+    private LoggerInterface $logger;
 
-    public function __construct($host, $port, $password)
-    {
-        parent::__construct($host, $port, $password, 1);
-        parent::build();
-    }
+    private Connector $connector;
 
-    public function setLogger(LoggerInterface $logger)
+    /**
+     * @throws ConnectorException
+     */
+    public function __construct(LoggerInterface $logger, ConnectorBuilder $builder)
     {
         $this->logger = $logger;
+        $this->connector = $builder->build();
     }
 
-    /**
-     * @inheritdoc
-     */
     public function saveCart(Cart $cart)
     {
+        $this->checkSession();
+
         try {
-            $this->connector->set($cart, session_id());
+            $this->connector->set(session_id(), $cart);
         } catch (Exception $e) {
             $this->logger->error('Error');
         }
     }
 
-    /**
-     * @return ?Cart
-     */
-    public function getCart()
+    public function getCart(): Cart
     {
+        $this->checkSession();
+
         try {
-            return $this->connector->get(session_id());
+            $cart = $this->connector->get(session_id());
+            return $cart ?? $this->createNewCart();
         } catch (Exception $e) {
             $this->logger->error('Error');
         }
+    }
 
-        return new Cart(session_id(), []);
+    private function createNewCart(): Cart
+    {
+        return new Cart(
+            ...
+        );
+    }
+
+    /**
+     * @throws NotAuthorizedException
+     */
+    private function checkSession(): void
+    {
+        if(!session_id()){
+            throw new NotAuthorizedException();
+        }
     }
 }

@@ -23,7 +23,7 @@ readonly class ProductsView
                 'thumbnail' => $product->getThumbnail(),
                 'price' => $product->getPrice(),
             ],
-            $this->productRepository->getByCategory($category)
+            $this->productRepository->getActiveByCategory($category)
         );
     }
 }

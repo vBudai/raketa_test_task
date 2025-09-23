@@ -9,11 +9,9 @@ use Raketa\BackendTestTask\Repository\Entity\Product;
 
 class ProductRepository
 {
-    private Connection $connection;
-
-    public function __construct(Connection $connection)
-    {
-        $this->connection = $connection;
+    public function __construct(
+        private Connection $connection
+    ){
     }
 
     public function getByUuid(string $uuid): Product
@@ -26,20 +24,20 @@ class ProductRepository
             throw new Exception('Product not found');
         }
 
-        return $this->make($row);
+        return $this->createProductFromRow($row);
     }
 
-    public function getByCategory(string $category): array
+    public function getActiveByCategory(string $category): array
     {
         return array_map(
-            static fn (array $row): Product => $this->make($row),
+            static fn (array $row): Product => $this->createProductFromRow($row),
             $this->connection->fetchAllAssociative(
                 "SELECT id FROM products WHERE is_active = 1 AND category = " . $category,
             )
         );
     }
 
-    public function make(array $row): Product
+    public function createProductFromRow(array $row): Product
     {
         return new Product(
             $row['id'],
