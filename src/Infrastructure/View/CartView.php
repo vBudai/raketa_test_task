@@ -2,18 +2,12 @@
 
 declare(strict_types = 1);
 
-namespace Raketa\BackendTestTask\View;
+namespace Raketa\BackendTestTask\Infrastructure\View;
 
 use Raketa\BackendTestTask\Domain\Cart;
-use Raketa\BackendTestTask\Repository\ProductRepository;
 
 readonly class CartView
 {
-    public function __construct(
-        private ProductRepository $productRepository
-    ) {
-    }
-
     public function toArray(Cart $cart): array
     {
         $data = [
@@ -28,30 +22,25 @@ readonly class CartView
                 'email' => $cart->getCustomer()->getEmail(),
             ],
             'payment_method' => $cart->getPaymentMethod(),
+            'total' => $cart->calculateTotal(),
         ];
 
-        $total = 0;
         $data['items'] = [];
         foreach ($cart->getItems() as $item) {
-            $product = $this->productRepository->getByUuid($item->getProductUuid());
-            $total += $product->getPrice() * $item->getQuantity();
-
+            $product = $item->getProduct();
             $data['items'][] = [
-                'uuid'     => $item->getUuid(),
-                'price'    => $item->getPrice(),
-                'total'    => $total,
+                'uuid' => $item->getUuid(),
+                'price' => $product->getPrice(),
                 'quantity' => $item->getQuantity(),
-                'product'  => [
-                    'id'        => $product->getId(),
-                    'uuid'      => $product->getUuid(),
-                    'name'      => $product->getName(),
+                'product'=> [
+                    'id' => $product->getId(),
+                    'uuid' => $product->getUuid(),
+                    'name' => $product->getName(),
                     'thumbnail' => $product->getThumbnail(),
-                    'price'     => $product->getPrice(),
+                    'price' => $product->getPrice(),
                 ],
             ];
         }
-
-        $data['total'] = $total;
 
         return $data;
     }

@@ -2,9 +2,9 @@
 
 declare(strict_types = 1);
 
-namespace Raketa\BackendTestTask\Infrastructure\Exception;
+namespace Raketa\BackendTestTask\Infrastructure\Db\Exception;
 
-class ConnectorException extends \Exception
+class RedisConnectorException extends \Exception
 {
     public function __construct(
         protected $message,

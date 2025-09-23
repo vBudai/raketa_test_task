@@ -2,12 +2,13 @@
 
 declare(strict_types = 1);
 
-namespace Raketa\BackendTestTask\Controller;
+namespace Raketa\BackendTestTask\Infrastructure\Controller;
 
-use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
-use Raketa\BackendTestTask\Repository\CartManager;
-use Raketa\BackendTestTask\View\CartView;
+use Raketa\BackendTestTask\Infrastructure\Dto\Request\GetCartRequest;
+use Raketa\BackendTestTask\Infrastructure\Dto\Response\JsonResponse;
+use Raketa\BackendTestTask\Infrastructure\Repository\CartManager;
+use Raketa\BackendTestTask\Infrastructure\View\CartView;
 
 readonly class GetCartController
 {
@@ -17,10 +18,10 @@ readonly class GetCartController
     ) {
     }
 
-    public function get(RequestInterface $request): ResponseInterface
+    public function get(GetCartRequest $request): ResponseInterface
     {
         $response = new JsonResponse();
-        $cart = $this->cartManager->getCart();
+        $cart = $this->cartManager->getCart($request->customer);
 
         $response->getBody()->write(
             json_encode(
@@ -31,6 +32,6 @@ readonly class GetCartController
 
         return $response
             ->withHeader('Content-Type', 'application/json; charset=utf-8')
-            ->withStatus(404);
+            ->withStatus(200);
     }
 }

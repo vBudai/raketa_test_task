@@ -7,8 +7,9 @@ create table if not exists products
     name text default '' not null comment 'Тип услуги',
     description text null comment 'Описание товара',
     thumbnail  varchar(255) null comment 'Ссылка на картинку',
-    price float not null comment 'Цена'
+    price int not null comment 'Цена в копейках'
 )
     comment 'Товары';
 
 create index is_active_idx on products (is_active);
+create index is_active_idx on products (category);

@@ -4,13 +4,14 @@ declare(strict_types = 1);
 
 namespace Raketa\BackendTestTask\Domain;
 
-final readonly class CartItem
+use Ramsey\Uuid\Uuid;
+
+final class CartItem implements \JsonSerializable
 {
     public function __construct(
-        public string $uuid,
-        public string $productUuid,
-        public float $price,
-        public int $quantity,
+        private readonly string $uuid,
+        private Product $product,
+        private readonly int $quantity,
     ) {
     }
 
@@ -19,18 +20,38 @@ final readonly class CartItem
         return $this->uuid;
     }
 
-    public function getProductUuid(): string
+    public function setProduct(Product $product): self
     {
-        return $this->productUuid;
+        $this->product = $product;
+
+        return $this;
     }
 
-    public function getPrice(): float
+    public function getProduct(): Product
     {
-        return $this->price;
+        return $this->product;
     }
 
     public function getQuantity(): int
     {
         return $this->quantity;
+    }
+
+    public function jsonSerialize(): array
+    {
+        return [
+            'uuid' => $this->uuid,
+            'product' => $this->product->jsonSerialize(),
+            'quantity' => $this->quantity,
+        ];
+    }
+
+    public static function fromArray(array $data): self
+    {
+        return new self(
+            $data['uuid'] ?? Uuid::uuid4()->toString(),
+            Product::fromArray($data['product'] ?? []),
+            (int)($data['quantity'] ?? 0)
+        );
     }
 }

@@ -2,31 +2,31 @@
 
 declare(strict_types = 1);
 
-namespace Raketa\BackendTestTask\Infrastructure;
+namespace Raketa\BackendTestTask\Infrastructure\Db;
 
-use Raketa\BackendTestTask\Infrastructure\Exception\ConnectorException;
+use Raketa\BackendTestTask\Infrastructure\Db\Exception\RedisConnectorException;
 use Redis;
 use RedisException;
 
-class ConnectorBuilder
+class RedisConnectorBuilder
 {
     public function __construct(
-        private string $host,
-        private int $port = 6379,
-        public ?string $password = null,
-        public ?int $dbindex = null,
+        private readonly string $host,
+        private readonly int $port = 6379,
+        public readonly ?string $password = null,
+        public readonly ?int $dbindex = null,
     ) {}
 
     /**
-     * @throws ConnectorException
+     * @throws RedisConnectorException
      */
-    public function build(): Connector
+    public function build(): RedisConnector
     {
         try{
             $redis = $this->connectRedis();
-            return new Connector($redis);
+            return new RedisConnector($redis);
         } catch (RedisException $e){
-            throw new ConnectorException($e->getMessage(), $e->getCode(), $e);
+            throw new RedisConnectorException($e->getMessage(), $e->getCode(), $e);
         }
     }
 
