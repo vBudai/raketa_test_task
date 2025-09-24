@@ -11,5 +11,5 @@ create table if not exists products
 )
     comment 'Товары';
 
-create index is_active_idx on products (is_active);
+create index is_active_idx on products (uuid);
 create index is_active_idx on products (category);
