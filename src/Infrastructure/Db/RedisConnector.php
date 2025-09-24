@@ -56,7 +56,7 @@ readonly class RedisConnector
                 );
             }
         } catch (RedisException $e) {
-            throw new RedisConnectorException('Connector error', (int)$e->getCode(), $e);
+            throw new RedisConnectorException('Connector error: ' . $e->getMessage(), (int)$e->getCode(), $e);
         } catch (\JsonException $e) {
             throw new RedisConnectorException('Json encode error: ' . $e->getMessage(), (int)$e->getCode(), $e);
         }
