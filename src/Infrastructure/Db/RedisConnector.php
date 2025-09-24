@@ -50,7 +50,7 @@ readonly class RedisConnector
             $result = $this->redis->setex($key, 24 * 60 * 60, $json);
             if(!$result) {
                 throw new RedisConnectorException(
-                    'Error due saving data: ' . $this->redis->getLastError(),
+                    'Error due saving data: ' . ($this->redis->getLastError() ?? ''),
                     500,
                     null
                 );

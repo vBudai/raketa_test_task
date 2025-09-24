@@ -24,17 +24,17 @@ readonly class GetCartUseCase
     {
         $cart = $this->cartManager->getCart($request->customer);
         if($cart->getItems()){
-            $this->updatePriceInCartItems($cart);
+            $this->loadProductsToCart($cart);
         }
 
-        return $this->cartManager->getCart($request->customer);
+        return $cart;
     }
 
-    private function updatePriceInCartItems(Cart $cart): void
+    private function loadProductsToCart(Cart $cart): void
     {
         foreach($cart->getItems() as $item){
             try{
-                $product = $this->productRepository->getByUuid($item->getProduct()->getUuid());
+                $product = $this->productRepository->getByUuid($item->getProductUuid());
                 $item->setProduct($product);
             } catch (\Doctrine\DBAL\Exception | \Exception $e){
                 $this->logger->warning('Error: ' . $e->getMessage());

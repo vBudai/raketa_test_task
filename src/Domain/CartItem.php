@@ -10,14 +10,20 @@ final class CartItem implements \JsonSerializable
 {
     public function __construct(
         private readonly string $uuid,
-        private Product $product,
         private readonly int $quantity,
+        private readonly string $productUuid,
+        private ?Product $product = null,
     ) {
     }
 
     public function getUuid(): string
     {
         return $this->uuid;
+    }
+
+    public function getProductUuid(): string
+    {
+        return $this->productUuid;
     }
 
     public function setProduct(Product $product): self
@@ -27,7 +33,7 @@ final class CartItem implements \JsonSerializable
         return $this;
     }
 
-    public function getProduct(): Product
+    public function getProduct(): ?Product
     {
         return $this->product;
     }
@@ -41,7 +47,7 @@ final class CartItem implements \JsonSerializable
     {
         return [
             'uuid' => $this->uuid,
-            'product' => $this->product->jsonSerialize(),
+            'productUuid' => $this->productUuid,
             'quantity' => $this->quantity,
         ];
     }
@@ -50,8 +56,8 @@ final class CartItem implements \JsonSerializable
     {
         return new self(
             $data['uuid'] ?? Uuid::uuid4()->toString(),
-            Product::fromArray($data['product'] ?? []),
-            (int)($data['quantity'] ?? 0)
+            (int)($data['quantity'] ?? 0),
+            (string)($data['productUuid'] ?? ''),
         );
     }
 }
